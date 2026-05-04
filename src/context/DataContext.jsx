@@ -5,6 +5,7 @@ import {
   fetchPredictions, fetchAcademics, fetchAttendance, fetchHealthRecords,
   chartData, dataMode
 } from '../services/dataService.js'
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
 
 const DataContext = createContext(null)
 export const useData = () => useContext(DataContext)
@@ -30,6 +31,11 @@ export function DataProvider({ children }) {
   const load = useCallback(async () => {
     setState((s) => ({ ...s, loading: true, error: null }))
     try {
+      // Pre-warm the auth session so all 8 parallel fetches below share a
+      // single resolved token instead of each racing the auth lock.
+      if (isSupabaseConfigured) {
+        await supabase.auth.getSession()
+      }
       const [students, teachers, alerts, metrics, predictions, academics, attendance, healthRecords] = await Promise.all([
         fetchStudents(),
         fetchTeachers(),
