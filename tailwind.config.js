@@ -4,20 +4,40 @@ export default {
   theme: {
     extend: {
       colors: {
+        bi: {
+          bg:        '#faf9f6',
+          card:      '#ffffff',
+          tint:      '#f5f1ea',
+          border:    '#e8e4dc',
+          text:      '#1c1917',
+          'text-soft': '#57534e',
+          'text-mute': '#a8a29e',
+          primary:      '#b45309',
+          'primary-hover': '#92400e',
+          'primary-soft': '#fed7aa',
+          good:      '#15803d',
+          'good-soft': '#d1fae5',
+          warn:      '#b45309',
+          'warn-soft': '#fef3c7',
+          bad:       '#b91c1c',
+          'bad-soft': '#fee2e2'
+        },
+        // Keep brand-* aliases pointing to bi-primary so existing code doesn't break:
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a'
+          50:  '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#d97706',
+          600: '#b45309',
+          700: '#92400e',
+          800: '#78350f',
+          900: '#7c2d12'
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif']
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
       }
     }
   },
