@@ -41,17 +41,19 @@ export default function AuthScreen() {
     }
   }
 
+  const inputClass = "w-full pl-9 pr-3 py-2 text-sm bg-bi-bg border border-bi-border rounded focus:outline-none focus:border-bi-primary"
+
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-bi-bg">
       {/* Left brand panel */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-brand-700 via-brand-600 to-blue-500 text-white p-12 flex-col justify-between">
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-bi-primary to-bi-primary-hover text-white p-12 flex-col justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur">
             <School className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-lg font-bold">Bagong Ilog ES</h1>
-            <p className="text-xs text-brand-100">Predictive Analytics Dashboard</p>
+            <p className="text-xs text-white/80">Predictive Analytics Dashboard</p>
           </div>
         </div>
 
@@ -60,7 +62,7 @@ export default function AuthScreen() {
             <h2 className="text-3xl font-bold leading-tight">
               Empowering education through AI-driven insights.
             </h2>
-            <p className="text-brand-100 text-sm mt-3 max-w-md">
+            <p className="text-white/85 text-sm mt-3 max-w-md">
               Track student performance, predict academic risk, and intervene early — all in one
               modern, secure dashboard.
             </p>
@@ -73,33 +75,33 @@ export default function AuthScreen() {
           </div>
         </div>
 
-        <p className="text-xs text-brand-100">© 2026 Bagong Ilog Elementary School · Pasig City</p>
+        <p className="text-xs text-white/70">© 2026 Bagong Ilog Elementary School · Pasig City</p>
       </div>
 
       {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-slate-50">
+      <div className="flex-1 flex items-center justify-center p-6 bg-bi-bg">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-bi-primary text-white flex items-center justify-center">
               <School className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-900">Bagong Ilog ES</h1>
-              <p className="text-xs text-slate-500">Predictive Analytics Dashboard</p>
+              <h1 className="text-lg font-bold text-bi-text">Bagong Ilog ES</h1>
+              <p className="text-xs text-bi-text-mute">Predictive Analytics Dashboard</p>
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h2 className="text-2xl font-bold text-bi-text">
             {mode === 'signin' ? 'Welcome back' : 'Create your account'}
           </h2>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-bi-text-soft mt-1">
             {mode === 'signin'
               ? 'Sign in to access the school dashboard.'
               : 'Choose your role and create an account to get started.'}
           </p>
 
           {isDemoMode && (
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
+            <div className="mt-4 p-3 bg-bi-warn-soft border border-bi-warn/20 rounded-lg text-xs text-bi-warn flex items-start gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Demo mode</p>
@@ -110,7 +112,7 @@ export default function AuthScreen() {
 
           {isDemoMode && mode === 'signin' && (
             <div className="mt-4">
-              <label className="text-sm font-medium text-slate-700">Preview as…</label>
+              <label className="text-sm font-medium text-bi-text-soft">Preview as…</label>
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {ROLES.map((r) => {
                   const Icon = r.icon
@@ -122,12 +124,12 @@ export default function AuthScreen() {
                       onClick={() => setRole(r.value)}
                       className={`p-2.5 rounded-lg border-2 text-center transition-all ${
                         active
-                          ? 'border-brand-600 bg-brand-50'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
+                          ? 'border-bi-primary bg-bi-primary-soft'
+                          : 'border-bi-border bg-bi-card hover:border-bi-text-mute'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 mx-auto mb-1 ${active ? 'text-brand-700' : 'text-slate-500'}`} />
-                      <p className={`text-[11px] font-semibold leading-tight ${active ? 'text-brand-700' : 'text-slate-700'}`}>{r.label}</p>
+                      <Icon className={`w-4 h-4 mx-auto mb-1 ${active ? 'text-bi-primary' : 'text-bi-text-mute'}`} />
+                      <p className={`text-[11px] font-semibold leading-tight ${active ? 'text-bi-primary' : 'text-bi-text-soft'}`}>{r.label}</p>
                     </button>
                   )
                 })}
@@ -143,13 +145,13 @@ export default function AuthScreen() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Maria Santos"
-                    className="auth-input"
+                    className={inputClass}
                     autoComplete="name"
                   />
                 </Field>
 
                 <div>
-                  <label className="text-sm font-medium text-slate-700">I am a…</label>
+                  <label className="text-sm font-medium text-bi-text-soft">I am a…</label>
                   <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3">
                     {ROLES.map((r) => {
                       const Icon = r.icon
@@ -161,17 +163,17 @@ export default function AuthScreen() {
                           onClick={() => setRole(r.value)}
                           className={`p-2.5 rounded-lg border-2 text-center transition-all ${
                             active
-                              ? 'border-brand-600 bg-brand-50'
-                              : 'border-slate-200 bg-white hover:border-slate-300'
+                              ? 'border-bi-primary bg-bi-primary-soft'
+                              : 'border-bi-border bg-bi-card hover:border-bi-text-mute'
                           }`}
                         >
-                          <Icon className={`w-4 h-4 mx-auto mb-1 ${active ? 'text-brand-700' : 'text-slate-500'}`} />
-                          <p className={`text-[11px] font-semibold leading-tight ${active ? 'text-brand-700' : 'text-slate-700'}`}>{r.label}</p>
+                          <Icon className={`w-4 h-4 mx-auto mb-1 ${active ? 'text-bi-primary' : 'text-bi-text-mute'}`} />
+                          <p className={`text-[11px] font-semibold leading-tight ${active ? 'text-bi-primary' : 'text-bi-text-soft'}`}>{r.label}</p>
                         </button>
                       )
                     })}
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{ROLES.find(r => r.value === role)?.desc}</p>
+                  <p className="text-xs text-bi-text-mute mt-1">{ROLES.find(r => r.value === role)?.desc}</p>
                 </div>
               </>
             )}
@@ -182,7 +184,7 @@ export default function AuthScreen() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="auth-input"
+                className={inputClass}
                 autoComplete="email"
                 required
               />
@@ -194,21 +196,21 @@ export default function AuthScreen() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="auth-input"
+                className={inputClass}
                 autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                 required
               />
             </Field>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-start gap-2">
+              <div className="p-3 bg-bi-bad-soft border border-bi-bad/20 rounded-lg text-xs text-bi-bad flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
             {info && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700">
+              <div className="p-3 bg-bi-good-soft border border-bi-good/20 rounded-lg text-xs text-bi-good">
                 {info}
               </div>
             )}
@@ -216,21 +218,21 @@ export default function AuthScreen() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-bi-primary hover:bg-bi-primary-hover disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {mode === 'signin' ? 'Sign In' : 'Create Account'}
             </button>
           </form>
 
-          <p className="text-sm text-slate-600 text-center mt-6">
+          <p className="text-sm text-bi-text-soft text-center mt-6">
             {mode === 'signin' ? (
               <>Don't have an account?{' '}
-                <button onClick={() => { setMode('signup'); setError(null); setInfo(null) }} className="text-brand-700 font-semibold hover:underline">Create one</button>
+                <button onClick={() => { setMode('signup'); setError(null); setInfo(null) }} className="text-bi-primary font-semibold hover:underline">Create one</button>
               </>
             ) : (
               <>Already have an account?{' '}
-                <button onClick={() => { setMode('signin'); setError(null); setInfo(null) }} className="text-brand-700 font-semibold hover:underline">Sign in</button>
+                <button onClick={() => { setMode('signin'); setError(null); setInfo(null) }} className="text-bi-primary font-semibold hover:underline">Sign in</button>
               </>
             )}
           </p>
@@ -243,9 +245,9 @@ export default function AuthScreen() {
 function Field({ label, icon: Icon, children }) {
   return (
     <div>
-      <label className="text-sm font-medium text-slate-700">{label}</label>
+      <label className="text-sm font-medium text-bi-text-soft">{label}</label>
       <div className="mt-1.5 relative">
-        <Icon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Icon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-bi-text-mute" />
         {children}
       </div>
     </div>
@@ -260,7 +262,7 @@ function Feature({ icon: Icon, title, desc }) {
       </div>
       <div>
         <p className="text-sm font-bold">{title}</p>
-        <p className="text-xs text-brand-100">{desc}</p>
+        <p className="text-xs text-white/80">{desc}</p>
       </div>
     </div>
   )
