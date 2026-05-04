@@ -36,7 +36,12 @@ export default function Reports() {
     const path = report.source.split('.')
     let value = data
     for (const p of path) value = value?.[p]
-    const rows = Array.isArray(value) ? value : []
+    let rows = Array.isArray(value) ? value : []
+    // The "At-Risk Students" report description promises only High-risk rows;
+    // filter here so the export matches what the user expects.
+    if (report.id === 'at-risk') {
+      rows = rows.filter((p) => p.riskLevel === 'High')
+    }
     download(`${report.id}.csv`, toCSV(rows))
   }
 
