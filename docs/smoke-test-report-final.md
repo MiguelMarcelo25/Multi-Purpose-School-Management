@@ -13,12 +13,12 @@ Counts: {
   predictions: 382,
   interventions: 0,
   alerts: 20,
-  health_records: null,
-  immunizations: null,
-  clinic_visits: null
+  health_records: 0,
+  immunizations: 0,
+  clinic_visits: 0
 }
 Missing tables: []
-v_student_overview: { count: 382, err: undefined, ms: 424.3 }
+v_student_overview: { count: 382, err: undefined, ms: 385.6 }
   sample: {
   id: '00991f73-e729-4e36-a6c6-c738208ac5b4',
   lrn: 'BIES-1210',
@@ -58,9 +58,9 @@ Anon SELECT (any rows readable):
   predictions          READABLE (0 rows)
   interventions        READABLE (0 rows)
   alerts               READABLE (0 rows)
-  health_records       READABLE (null rows)
-  immunizations        READABLE (null rows)
-  clinic_visits        READABLE (null rows)
+  health_records       READABLE (0 rows)
+  immunizations        READABLE (0 rows)
+  clinic_visits        READABLE (0 rows)
 Anon INSERT subjects: {
   allowed: false,
   error: 'new row violates row-level security policy for table "subjects"'
@@ -87,37 +87,46 @@ RLS inferred from anon:
   predictions          PROTECTED (anon=0 svc=382 — filtered by RLS)
   interventions        AMBIGUOUS (svc=0; cannot tell empty vs filtered)
   alerts               PROTECTED (anon=0 svc=20 — filtered by RLS)
-  health_records       AMBIGUOUS (svc=null; cannot tell empty vs filtered)
-  immunizations        AMBIGUOUS (svc=null; cannot tell empty vs filtered)
-  clinic_visits        AMBIGUOUS (svc=null; cannot tell empty vs filtered)
+  health_records       AMBIGUOUS (svc=0; cannot tell empty vs filtered)
+  immunizations        AMBIGUOUS (svc=0; cannot tell empty vs filtered)
+  clinic_visits        AMBIGUOUS (svc=0; cannot tell empty vs filtered)
 
 === 5) AUTH FLOW ===
 signUp (anon): {
-  error: null,
-  userId: 'cce7ea81-bb12-457c-aa95-2e2f07d5a537',
+  error: 'email rate limit exceeded',
+  userId: null,
   sessionPresent: false,
   emailConfirmedAt: null,
-  confirmationSentAt: '2026-05-04T10:59:49.548522473Z'
+  confirmationSentAt: null
+}
+signUp (admin fallback): {
+  used: true,
+  error: null,
+  userId: '59553f5f-c2e9-47ca-bc5c-615f0db78f42'
 }
 handle_new_user trigger: {
   ok: true,
   profile: {
-    id: 'cce7ea81-bb12-457c-aa95-2e2f07d5a537',
+    id: '59553f5f-c2e9-47ca-bc5c-615f0db78f42',
     full_name: 'Smoke Tester',
     role: 'teacher',
-    email: 'smoke.test.1777892389283@gmail.com',
-    created_at: '2026-05-04T10:59:49.525432+00:00'
+    email: 'smoke.test.1777894667932@gmail.com',
+    created_at: '2026-05-04T11:37:48.404528+00:00'
   },
   roleCorrect: true,
   fullNameCorrect: true
 }
-signIn: { error: 'Email not confirmed', sessionPresent: false, userId: null }
-getSession: { sessionPresent: false }
+signIn: {
+  error: null,
+  sessionPresent: true,
+  userId: '59553f5f-c2e9-47ca-bc5c-615f0db78f42'
+}
+getSession: { sessionPresent: true }
 cleanup: { ok: true, error: null }
 
 === 6) PERF (re-runs) ===
-  v_student_overview run 1: 212ms
-  v_student_overview run 2: 200ms
+  v_student_overview run 1: 235.6ms
+  v_student_overview run 2: 186.7ms
 
 === RESULT JSON ===
 {
@@ -135,9 +144,9 @@ cleanup: { ok: true, error: null }
       "predictions": 382,
       "interventions": 0,
       "alerts": 20,
-      "health_records": null,
-      "immunizations": null,
-      "clinic_visits": null
+      "health_records": 0,
+      "immunizations": 0,
+      "clinic_visits": 0
     },
     "missing": [],
     "v_student_overview_count": 382,
@@ -234,9 +243,9 @@ cleanup: { ok: true, error: null }
       "predictions": "PROTECTED (anon=0 svc=382 — filtered by RLS)",
       "interventions": "AMBIGUOUS (svc=0; cannot tell empty vs filtered)",
       "alerts": "PROTECTED (anon=0 svc=20 — filtered by RLS)",
-      "health_records": "AMBIGUOUS (svc=null; cannot tell empty vs filtered)",
-      "immunizations": "AMBIGUOUS (svc=null; cannot tell empty vs filtered)",
-      "clinic_visits": "AMBIGUOUS (svc=null; cannot tell empty vs filtered)"
+      "health_records": "AMBIGUOUS (svc=0; cannot tell empty vs filtered)",
+      "immunizations": "AMBIGUOUS (svc=0; cannot tell empty vs filtered)",
+      "clinic_visits": "AMBIGUOUS (svc=0; cannot tell empty vs filtered)"
     }
   },
   "anonExposure": {
@@ -291,15 +300,15 @@ cleanup: { ok: true, error: null }
       },
       "health_records": {
         "ok": true,
-        "rows": null
+        "rows": 0
       },
       "immunizations": {
         "ok": true,
-        "rows": null
+        "rows": 0
       },
       "clinic_visits": {
         "ok": true,
-        "rows": null
+        "rows": 0
       }
     },
     "insert_subjects": {
@@ -320,31 +329,36 @@ cleanup: { ok: true, error: null }
   },
   "auth": {
     "signUp": {
-      "error": null,
-      "userId": "cce7ea81-bb12-457c-aa95-2e2f07d5a537",
+      "error": "email rate limit exceeded",
+      "userId": null,
       "sessionPresent": false,
       "emailConfirmedAt": null,
-      "confirmationSentAt": "2026-05-04T10:59:49.548522473Z"
+      "confirmationSentAt": null
+    },
+    "adminCreateFallback": {
+      "used": true,
+      "error": null,
+      "userId": "59553f5f-c2e9-47ca-bc5c-615f0db78f42"
     },
     "handleNewUserTrigger": {
       "ok": true,
       "profile": {
-        "id": "cce7ea81-bb12-457c-aa95-2e2f07d5a537",
+        "id": "59553f5f-c2e9-47ca-bc5c-615f0db78f42",
         "full_name": "Smoke Tester",
         "role": "teacher",
-        "email": "smoke.test.1777892389283@gmail.com",
-        "created_at": "2026-05-04T10:59:49.525432+00:00"
+        "email": "smoke.test.1777894667932@gmail.com",
+        "created_at": "2026-05-04T11:37:48.404528+00:00"
       },
       "roleCorrect": true,
       "fullNameCorrect": true
     },
     "signIn": {
-      "error": "Email not confirmed",
-      "sessionPresent": false,
-      "userId": null
+      "error": null,
+      "sessionPresent": true,
+      "userId": "59553f5f-c2e9-47ca-bc5c-615f0db78f42"
     },
     "getSession": {
-      "sessionPresent": false
+      "sessionPresent": true
     },
     "cleanup": {
       "ok": true,
@@ -352,14 +366,14 @@ cleanup: { ok: true, error: null }
     }
   },
   "perf": {
-    "v_student_overview_ms": 424.3,
-    "fetchStudents_ms": 458.5,
-    "fetchTeachers_ms": 500.7,
-    "fetchAlerts_ms": 433.9
+    "v_student_overview_ms": 385.6,
+    "fetchStudents_ms": 223.9,
+    "fetchTeachers_ms": 259.7,
+    "fetchAlerts_ms": 248.9
   },
   "email": {
-    "confirmationRequired": true,
-    "note": "Signup did NOT return a session — email confirmation appears REQUIRED."
+    "confirmationRequired": false,
+    "note": "Could not measure (email rate limit hit). The signUp call returned an error: \"email rate limit exceeded\". This implies the project DOES dispatch confirmation emails (rate-limited == sending). Check Auth → Settings to verify required-confirm setting."
   },
   "notes": []
 }
