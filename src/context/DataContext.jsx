@@ -1,44 +1,58 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+// src/context/DataContext.jsx — full rewrite
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
   fetchStudents, fetchTeachers, fetchAlerts, fetchSchoolMetrics,
+  fetchPredictions, fetchAcademics, fetchAttendance, fetchHealthRecords,
   chartData, dataMode
 } from '../services/dataService.js'
 
 const DataContext = createContext(null)
 export const useData = () => useContext(DataContext)
 
-export function DataProvider({ children }) {
-  const [state, setState] = useState({
-    loading: true,
-    error: null,
-    students: [],
-    teachers: [],
-    alerts: [],
-    metrics: null,
-    charts: chartData,
-    mode: dataMode
-  })
+const INITIAL = {
+  loading: true,
+  error: null,
+  students: [],
+  teachers: [],
+  alerts: [],
+  metrics: null,
+  predictions: [],
+  academics: { bySubject: [], byGrade: [], honorRoll: [] },
+  attendance: { byDay: [], bySection: [] },
+  healthRecords: { records: [], visits: [] },
+  charts: chartData,
+  mode: dataMode
+}
 
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const [students, teachers, alerts, metrics] = await Promise.all([
-          fetchStudents(),
-          fetchTeachers(),
-          fetchAlerts(),
-          fetchSchoolMetrics()
-        ])
-        if (cancelled) return
-        setState((s) => ({ ...s, loading: false, students, teachers, alerts, metrics }))
-      } catch (err) {
-        if (cancelled) return
-        console.error('Data load failed', err)
-        setState((s) => ({ ...s, loading: false, error: err.message || 'Failed to load data' }))
-      }
-    })()
-    return () => { cancelled = true }
+export function DataProvider({ children }) {
+  const [state, setState] = useState(INITIAL)
+
+  const load = useCallback(async () => {
+    setState((s) => ({ ...s, loading: true, error: null }))
+    try {
+      const [students, teachers, alerts, metrics, predictions, academics, attendance, healthRecords] = await Promise.all([
+        fetchStudents(),
+        fetchTeachers(),
+        fetchAlerts(),
+        fetchSchoolMetrics(),
+        fetchPredictions(),
+        fetchAcademics(),
+        fetchAttendance(),
+        fetchHealthRecords()
+      ])
+      setState((s) => ({
+        ...s,
+        loading: false,
+        students, teachers, alerts, metrics,
+        predictions, academics, attendance, healthRecords
+      }))
+    } catch (err) {
+      console.error('Data load failed', err)
+      setState((s) => ({ ...s, loading: false, error: err.message || 'Failed to load data' }))
+    }
   }, [])
 
-  return <DataContext.Provider value={state}>{children}</DataContext.Provider>
+  useEffect(() => { load() }, [load])
+
+  return <DataContext.Provider value={{ ...state, retry: load }}>{children}</DataContext.Provider>
 }

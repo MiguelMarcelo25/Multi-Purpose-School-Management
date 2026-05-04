@@ -47,6 +47,7 @@ function ProtectedShell() {
   const { role } = useAuth()
   const allowed = ROLE_VIEWS[role] || ['dashboard']
   const [view, setView] = useState(allowed[0])
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const data = useData()
 
   // Guard against deep linking to unauthorized views
@@ -100,9 +101,19 @@ function ProtectedShell() {
 
   return (
     <div className="flex bg-slate-50 min-h-screen">
-      <Sidebar active={safeView} onNavigate={setView} allowed={allowed} />
+      <Sidebar
+        active={safeView}
+        onNavigate={setView}
+        allowed={allowed}
+        drawerOpen={drawerOpen}
+        setDrawerOpen={setDrawerOpen}
+      />
       <main className="flex-1 min-w-0">
-        <TopBar title={meta.title} subtitle={meta.subtitle} />
+        <TopBar
+          title={meta.title}
+          subtitle={meta.subtitle}
+          onMenuClick={() => setDrawerOpen(true)}
+        />
         {data.mode === 'mock' && <ModeBanner />}
         {render()}
       </main>

@@ -161,6 +161,151 @@ export async function fetchSchoolMetrics() {
 }
 
 // ---------------------------------------------------------------------
+// Predictions (with student joins for the predictive view)
+// ---------------------------------------------------------------------
+export async function fetchPredictions() {
+  if (!isSupabaseConfigured) return MOCK_STUDENTS.map((s) => ({ ...computeRisk(s), studentName: s.name, lrn: s.id }))
+
+  const { data, error } = await supabase
+    .from('predictions')
+    .select(`
+      id, risk_score, risk_level, projected_average, failing_subjects, computed_at,
+      student:students(lrn, full_name, gender, age,
+        enrollments(section:sections(grade_level, name))
+      )
+    `)
+    .order('risk_score', { ascending: false })
+
+  if (error) throw error
+  return data.map((p) => ({
+    id: p.id,
+    riskScore: p.risk_score,
+    riskLevel: p.risk_level,
+    projectedAverage: Number(p.projected_average) || 0,
+    failingSubjects: p.failing_subjects,
+    computedAt: p.computed_at?.slice(0, 10),
+    studentName: p.student?.full_name,
+    lrn: p.student?.lrn,
+    grade: p.student?.enrollments?.[0]?.section?.grade_level,
+    section: p.student?.enrollments?.[0]?.section?.name
+  }))
+}
+
+// ---------------------------------------------------------------------
+// Academics (grade aggregates by subject + grade level)
+// ---------------------------------------------------------------------
+export async function fetchAcademics() {
+  if (!isSupabaseConfigured) return { bySubject: SUBJECT_PERFORMANCE, byGrade: GRADE_PERFORMANCE, honorRoll: [] }
+
+  const { data, error } = await supabase
+    .from('grades')
+    .select(`
+      grade, quarter,
+      subject:subjects(name),
+      student:students(full_name, lrn,
+        enrollments(section:sections(grade_level, name))
+      )
+    `)
+  if (error) throw error
+
+  // Aggregate by subject
+  const bySubjectMap = {}
+  for (const g of data) {
+    const subj = g.subject?.name || 'Unknown'
+    bySubjectMap[subj] ??= { subject: subj, sum: 0, count: 0 }
+    bySubjectMap[subj].sum += Number(g.grade)
+    bySubjectMap[subj].count++
+  }
+  const bySubject = Object.values(bySubjectMap).map((s) => ({ subject: s.subject, average: Math.round((s.sum / s.count) * 10) / 10 }))
+
+  // Aggregate by grade level
+  const byGradeMap = {}
+  for (const g of data) {
+    const gl = g.student?.enrollments?.[0]?.section?.grade_level
+    if (!gl) continue
+    byGradeMap[gl] ??= { grade: `Grade ${gl}`, sum: 0, count: 0 }
+    byGradeMap[gl].sum += Number(g.grade)
+    byGradeMap[gl].count++
+  }
+  const byGrade = Object.values(byGradeMap).sort((a, b) => a.grade.localeCompare(b.grade))
+    .map((g) => ({ grade: g.grade, average: Math.round((g.sum / g.count) * 10) / 10 }))
+
+  // Honor roll: students whose average across all subjects >= 90
+  const studentMap = {}
+  for (const g of data) {
+    const name = g.student?.full_name
+    if (!name) continue
+    studentMap[name] ??= { name, lrn: g.student.lrn, sum: 0, count: 0 }
+    studentMap[name].sum += Number(g.grade)
+    studentMap[name].count++
+  }
+  const honorRoll = Object.values(studentMap)
+    .map((s) => ({ name: s.name, lrn: s.lrn, average: Math.round((s.sum / s.count) * 10) / 10 }))
+    .filter((s) => s.average >= 90)
+    .sort((a, b) => b.average - a.average)
+
+  return { bySubject, byGrade, honorRoll }
+}
+
+// ---------------------------------------------------------------------
+// Attendance (daily aggregates and per-section breakdown)
+// ---------------------------------------------------------------------
+export async function fetchAttendance() {
+  if (!isSupabaseConfigured) return { byDay: ATTENDANCE_BY_MONTH, bySection: [] }
+
+  const { data, error } = await supabase
+    .from('attendance')
+    .select(`date, status, student:students(enrollments(section:sections(grade_level, name)))`)
+    .gte('date', new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10))
+  if (error) throw error
+
+  // Daily aggregates
+  const byDayMap = {}
+  for (const a of data) {
+    byDayMap[a.date] ??= { date: a.date, present: 0, total: 0 }
+    byDayMap[a.date].total++
+    if (a.status === 'present') byDayMap[a.date].present++
+  }
+  const byDay = Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date))
+    .map((d) => ({ date: d.date, attendance_pct: Math.round((d.present / d.total) * 100 * 10) / 10 }))
+
+  // Section aggregates
+  const bySectionMap = {}
+  for (const a of data) {
+    const sec = a.student?.enrollments?.[0]?.section
+    if (!sec) continue
+    const key = `Grade ${sec.grade_level} ${sec.name}`
+    bySectionMap[key] ??= { section: key, present: 0, total: 0 }
+    bySectionMap[key].total++
+    if (a.status === 'present') bySectionMap[key].present++
+  }
+  const bySection = Object.values(bySectionMap)
+    .map((s) => ({ section: s.section, attendance_pct: Math.round((s.present / s.total) * 100 * 10) / 10 }))
+    .sort((a, b) => a.section.localeCompare(b.section))
+
+  return { byDay, bySection }
+}
+
+// ---------------------------------------------------------------------
+// Health records (BMI, immunizations, clinic visits)
+// ---------------------------------------------------------------------
+export async function fetchHealthRecords() {
+  if (!isSupabaseConfigured) return { records: [], visits: [] }
+
+  const [recordsRes, visitsRes] = await Promise.all([
+    supabase.from('health_records').select('*, student:students(full_name, lrn)').limit(100),
+    supabase.from('clinic_visits').select('*, student:students(full_name, lrn)').order('visit_date', { ascending: false }).limit(50)
+  ])
+  if (recordsRes.error) throw recordsRes.error
+  if (visitsRes.error) throw visitsRes.error
+
+  return {
+    records: recordsRes.data || [],
+    visits: visitsRes.data || []
+  }
+}
+
+// ---------------------------------------------------------------------
 // Static-ish chart data — re-exported for now; later move to live aggregations
 // ---------------------------------------------------------------------
 export const chartData = {
