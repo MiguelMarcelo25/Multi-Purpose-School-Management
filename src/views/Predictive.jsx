@@ -82,7 +82,7 @@ export default function Predictive() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         <PageHeader
           title="Predictive Analytics"
           subtitle="Risk forecasts and early-warning indicators"
@@ -95,7 +95,7 @@ export default function Predictive() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <PageHeader
           title="Predictive Analytics"
           subtitle="Risk forecasts and early-warning indicators"
@@ -106,7 +106,7 @@ export default function Predictive() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <PageHeader
         title="Predictive Analytics"
         subtitle="Risk forecasts and early-warning indicators"

@@ -85,7 +85,7 @@ export default function Enrollment() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Enrollment" subtitle="Manage section assignments" />
         <LoadingState variant="kpis" />
         <LoadingState rows={5} />
@@ -95,7 +95,7 @@ export default function Enrollment() {
 
   if (error) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Enrollment" subtitle="Manage section assignments" />
         <ErrorState title="Failed to load enrollment" message={error} onRetry={retry} />
       </div>
@@ -103,7 +103,7 @@ export default function Enrollment() {
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-40 bg-bi-good text-white text-sm px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2">

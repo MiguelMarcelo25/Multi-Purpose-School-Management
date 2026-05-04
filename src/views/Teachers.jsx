@@ -73,7 +73,7 @@ export default function Teachers() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         <PageHeader title="Teachers" subtitle="Faculty directory and performance" />
         <LoadingState variant="kpis" />
         <LoadingState rows={6} />
@@ -83,7 +83,7 @@ export default function Teachers() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <PageHeader title="Teachers" subtitle="Faculty directory and performance" />
         <ErrorState message={error} onRetry={retry} />
       </div>
@@ -91,7 +91,7 @@ export default function Teachers() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <PageHeader
         title="Teachers"
         subtitle="Faculty directory and performance"

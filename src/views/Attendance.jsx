@@ -39,7 +39,7 @@ export default function Attendance() {
   ]
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-5">
       <PageHeader
         title="Attendance"
         subtitle="Daily presence tracking and per-section breakdown"

@@ -68,7 +68,7 @@ export default function Students() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Students" subtitle="Roster of enrolled learners" />
         <LoadingState rows={6} />
       </div>
@@ -77,7 +77,7 @@ export default function Students() {
 
   if (error) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Students" subtitle="Roster of enrolled learners" />
         <ErrorState title="Failed to load students" message={error} onRetry={retry} />
       </div>
@@ -85,7 +85,7 @@ export default function Students() {
   }
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <PageHeader
         title="Students"
         subtitle={`${filtered.length} of ${students.length} students`}
@@ -141,15 +141,15 @@ export default function Students() {
         <div className="fixed inset-0 z-30 flex justify-end">
           <div className="absolute inset-0 bg-bi-text/40" onClick={() => setSelected(null)} />
           <div className="relative w-full max-w-lg bg-bi-card h-full overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-bi-card border-b border-bi-border p-5 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-bi-text">{selected.name}</h3>
-                <p className="text-xs text-bi-text-mute font-mono">{selected.id} · Grade {selected.grade}-{selected.section}</p>
+            <div className="sticky top-0 bg-bi-card border-b border-bi-border p-4 sm:p-5 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-bold text-bi-text truncate">{selected.name}</h3>
+                <p className="text-xs text-bi-text-mute font-mono truncate">{selected.id} · Grade {selected.grade}-{selected.section}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="p-2 hover:bg-bi-tint rounded-lg"><X className="w-5 h-5 text-bi-text-soft" /></button>
+              <button onClick={() => setSelected(null)} className="p-2 hover:bg-bi-tint rounded-lg flex-shrink-0"><X className="w-5 h-5 text-bi-text-soft" /></button>
             </div>
 
-            <div className="p-5 space-y-5">
+            <div className="p-4 sm:p-5 space-y-5">
               {/* Risk Card */}
               <div className={`rounded-[10px] p-4 border ${
                 selected.risk.level === 'High'   ? 'bg-bi-bad-soft border-bi-bad/20' :

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 export default function Settings() {
   const { profile, signOut } = useAuth()
   return (
-    <div className="p-6 max-w-3xl">
+    <div className="p-4 md:p-6 max-w-3xl">
       <PageHeader title="Settings" subtitle="Account and school configuration" />
 
       <div className="space-y-3">

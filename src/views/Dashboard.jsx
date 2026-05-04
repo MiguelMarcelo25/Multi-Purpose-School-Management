@@ -17,7 +17,7 @@ export default function Dashboard({ onNavigate }) {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Dashboard" subtitle="School-wide overview" />
         <LoadingState variant="kpis" />
         <LoadingState rows={4} />
@@ -27,7 +27,7 @@ export default function Dashboard({ onNavigate }) {
 
   if (error) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Dashboard" subtitle="School-wide overview" />
         <ErrorState title="Failed to load dashboard" message={error} onRetry={retry} />
       </div>
@@ -36,7 +36,7 @@ export default function Dashboard({ onNavigate }) {
 
   if (!metrics) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Dashboard" subtitle="School-wide overview" />
         <EmptyState title="No metrics yet" message="School metrics will appear once data has been seeded." />
       </div>
@@ -51,7 +51,7 @@ export default function Dashboard({ onNavigate }) {
   ]
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-5">
       <PageHeader
         title="Dashboard"
         subtitle="School-wide overview · SY 2025–2026"

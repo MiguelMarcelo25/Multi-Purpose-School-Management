@@ -38,7 +38,7 @@ export default function MyProgress() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="My Progress" subtitle="Your academic snapshot" />
         <LoadingState variant="kpis" />
         <LoadingState rows={4} />
@@ -48,7 +48,7 @@ export default function MyProgress() {
 
   if (error) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="My Progress" subtitle="Your academic snapshot" />
         <ErrorState title="Failed to load progress" message={error} onRetry={retry} />
       </div>
@@ -57,7 +57,7 @@ export default function MyProgress() {
 
   if (!me) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="My Progress" subtitle="Your academic snapshot" />
         <EmptyState
           title="No student record linked"
@@ -119,7 +119,7 @@ export default function MyProgress() {
   ]
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 md:p-6 space-y-4">
       <PageHeader
         title={`Welcome, ${profile?.full_name || me.name}`}
         subtitle={`Grade ${me.grade} – ${me.section} · LRN ${me.id}`}

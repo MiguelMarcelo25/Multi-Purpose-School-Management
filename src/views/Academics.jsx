@@ -70,7 +70,7 @@ export default function Academics() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         <PageHeader title="Academics" subtitle="Subject performance and honor roll" />
         <LoadingState variant="kpis" />
         <LoadingState rows={6} />
@@ -80,7 +80,7 @@ export default function Academics() {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <PageHeader title="Academics" subtitle="Subject performance and honor roll" />
         <ErrorState message={error} onRetry={retry} />
       </div>
@@ -94,7 +94,7 @@ export default function Academics() {
         subtitle="Subject performance and honor roll"
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         <KPICard
           label="School Average"
           value={`${stats.schoolAvg.toFixed(1)}%`}

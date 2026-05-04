@@ -25,7 +25,7 @@ export default function Alerts() {
   }), [alerts])
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-4 md:p-6 space-y-5">
       <PageHeader
         title="Alerts"
         subtitle="Active notifications flagged by the early-warning system"
@@ -55,10 +55,10 @@ export default function Alerts() {
             <KPICard label="Low"           value={counts.low}    icon={AlertTriangle} />
           </div>
 
-          <div className="bg-bi-card border border-bi-border rounded-[10px] p-[14px]">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-bi-card border border-bi-border rounded-[10px] p-3 sm:p-[14px]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
               <h3 className="text-sm font-semibold text-bi-text">All Alerts</h3>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap">
                 {SEVERITY_FILTERS.map((s) => (
                   <button
                     key={s}

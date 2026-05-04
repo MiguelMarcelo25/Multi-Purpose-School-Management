@@ -47,7 +47,7 @@ export default function Reports() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Reports" subtitle="Generate exports of school data" />
         <LoadingState rows={3} />
       </div>
@@ -56,7 +56,7 @@ export default function Reports() {
 
   if (error) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Reports" subtitle="Generate exports of school data" />
         <ErrorState title="Failed to load report data" message={error} onRetry={retry} />
       </div>
@@ -65,7 +65,7 @@ export default function Reports() {
 
   if (!REPORTS.length) {
     return (
-      <div className="p-6 space-y-4">
+      <div className="p-4 md:p-6 space-y-4">
         <PageHeader title="Reports" subtitle="Generate exports of school data" />
         <EmptyState icon={FileText} title="No reports configured" message="Reports will appear here once configured." />
       </div>
@@ -73,9 +73,9 @@ export default function Reports() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <PageHeader title="Reports" subtitle="Generate exports of school data" />
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
         {REPORTS.map((r) => (
           <ChartCard key={r.id} title={r.title} subtitle={r.desc}>
             <button
