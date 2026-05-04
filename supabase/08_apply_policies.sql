@@ -11,6 +11,19 @@
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
+-- 0) Backfill missing schema additions from 03_roles_and_health.sql
+--    (audit found students.profile_id was never added, so the
+--    my_student_id() helper below would error otherwise).
+-- ---------------------------------------------------------------------
+alter table public.students add column if not exists profile_id uuid references public.profiles(id) on delete set null;
+create index if not exists students_profile_id_idx on public.students(profile_id);
+
+-- Expand profiles.role check to allow the new roles (idempotent).
+alter table public.profiles drop constraint if exists profiles_role_check;
+alter table public.profiles add constraint profiles_role_check
+  check (role in ('admin','principal','teacher','nurse','parent','student'));
+
+-- ---------------------------------------------------------------------
 -- 1) Enable RLS on every table the dashboard reads
 -- ---------------------------------------------------------------------
 alter table public.profiles         enable row level security;
