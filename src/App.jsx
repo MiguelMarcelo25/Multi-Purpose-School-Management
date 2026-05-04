@@ -109,11 +109,7 @@ function ProtectedShell() {
         setDrawerOpen={setDrawerOpen}
       />
       <main className="flex-1 min-w-0">
-        <TopBar
-          title={meta.title}
-          subtitle={meta.subtitle}
-          onMenuClick={() => setDrawerOpen(true)}
-        />
+        <TopBar onMenuClick={() => setDrawerOpen(true)} />
         {data.mode === 'mock' && <ModeBanner />}
         {render()}
       </main>
