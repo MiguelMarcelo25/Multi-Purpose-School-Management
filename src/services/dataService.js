@@ -140,6 +140,17 @@ export async function fetchSchoolMetrics() {
 
   const students = await fetchStudents()
   const total = students.length
+  // Guard against divide-by-zero when no students are visible (e.g. RLS
+  // hides everything for a fresh role) — return a coherent zero-state
+  // instead of NaN that would crash the dashboard KPI cards.
+  if (total === 0) {
+    return {
+      totalStudents: 0, teachers: 0, sections: 0, grades: 6,
+      avgAttendance: 0, avgGrade: 0,
+      highRisk: 0, mediumRisk: 0, lowRisk: 0,
+      dropoutRiskPct: 0
+    }
+  }
   const avgAttendance = round1(students.reduce((a, s) => a + s.attendance, 0) / total)
   const avgGrade      = round1(students.reduce((a, s) => a + s.average, 0)    / total)
   const highRisk      = students.filter((s) => s.risk.level === 'High').length
@@ -305,18 +316,21 @@ export async function fetchAttendance() {
 // Health records (BMI, immunizations, clinic visits)
 // ---------------------------------------------------------------------
 export async function fetchHealthRecords() {
-  if (!isSupabaseConfigured) return { records: [], visits: [] }
+  if (!isSupabaseConfigured) return { records: [], immunizations: [], visits: [] }
 
-  const [recordsRes, visitsRes] = await Promise.all([
-    supabase.from('health_records').select('*, student:students(full_name, lrn)').limit(100),
+  const [recordsRes, immunRes, visitsRes] = await Promise.all([
+    supabase.from('health_records').select('*, student:students(full_name, lrn)').limit(500),
+    supabase.from('immunizations').select('*, student:students(full_name, lrn)').limit(2000),
     supabase.from('clinic_visits').select('*, student:students(full_name, lrn)').order('visit_date', { ascending: false }).limit(50)
   ])
   if (recordsRes.error) throw recordsRes.error
-  if (visitsRes.error) throw visitsRes.error
+  if (immunRes.error)   throw immunRes.error
+  if (visitsRes.error)  throw visitsRes.error
 
   return {
-    records: recordsRes.data || [],
-    visits: visitsRes.data || []
+    records:       recordsRes.data || [],
+    immunizations: immunRes.data   || [],
+    visits:        visitsRes.data  || []
   }
 }
 

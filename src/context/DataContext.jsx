@@ -20,7 +20,7 @@ const INITIAL = {
   predictions: [],
   academics: { bySubject: [], byGrade: [], honorRoll: [] },
   attendance: { byDay: [], bySection: [] },
-  healthRecords: { records: [], visits: [] },
+  healthRecords: { records: [], immunizations: [], visits: [] },
   charts: chartData,
   mode: dataMode
 }
