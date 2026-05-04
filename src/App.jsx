@@ -123,7 +123,7 @@ function ProtectedShell() {
 
 function ModeBanner() {
   return (
-    <div className="bg-amber-50 border-b border-amber-200 px-8 py-2 flex items-center gap-2 text-xs text-amber-800">
+    <div className="bg-amber-50 border-b border-amber-200 px-4 sm:px-6 md:px-8 py-2 flex items-center gap-2 text-xs text-amber-800">
       <Database className="w-3.5 h-3.5" />
       <span><b>Mock data mode.</b> Add Supabase credentials to <code>.env</code> to switch to live database.</span>
     </div>

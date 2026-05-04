@@ -4,7 +4,7 @@ import { PageHeader } from './ui'
 
 export default function TopBar({ title, subtitle, actions, onMenuClick }) {
   return (
-    <div className="bg-bi-bg px-6 pt-6">
+    <div className="bg-bi-bg px-4 sm:px-6 pt-4 sm:pt-6">
       <div className="flex items-start gap-3">
         {onMenuClick && (
           <button

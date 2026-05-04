@@ -51,7 +51,7 @@ export default function Sidebar({ active, onNavigate, allowed, drawerOpen = fals
         />
       )}
       <aside
-        className={`fixed md:sticky inset-y-0 left-0 top-0 z-50 w-[200px] bg-bi-card border-r border-bi-border h-screen flex-shrink-0 transition-transform flex flex-col ${
+        className={`fixed md:sticky inset-y-0 left-0 top-0 z-50 w-[260px] md:w-[200px] bg-bi-card border-r border-bi-border h-screen flex-shrink-0 transition-transform flex flex-col ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
