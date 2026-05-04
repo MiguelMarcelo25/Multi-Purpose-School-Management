@@ -164,7 +164,22 @@ export async function fetchSchoolMetrics() {
 // Predictions (with student joins for the predictive view)
 // ---------------------------------------------------------------------
 export async function fetchPredictions() {
-  if (!isSupabaseConfigured) return MOCK_STUDENTS.map((s) => ({ ...computeRisk(s), studentName: s.name, lrn: s.id }))
+  if (!isSupabaseConfigured) {
+    return MOCK_STUDENTS.map((s) => {
+      const r = computeRisk(s)
+      return {
+        id: s.id,
+        riskScore: r.score,
+        riskLevel: r.level,
+        projectedAverage: r.projectedAverage,
+        failingSubjects: r.failingSubjects,
+        studentName: s.name,
+        lrn: s.id,
+        grade: s.grade,
+        section: s.section
+      }
+    })
+  }
 
   const { data, error } = await supabase
     .from('predictions')
