@@ -161,6 +161,37 @@ export async function fetchSchoolMetrics() {
 }
 
 // ---------------------------------------------------------------------
+// Predictions (with student joins for the predictive view)
+// ---------------------------------------------------------------------
+export async function fetchPredictions() {
+  if (!isSupabaseConfigured) return MOCK_STUDENTS.map((s) => ({ ...computeRisk(s), studentName: s.name, lrn: s.id }))
+
+  const { data, error } = await supabase
+    .from('predictions')
+    .select(`
+      id, risk_score, risk_level, projected_average, failing_subjects, computed_at,
+      student:students(lrn, full_name, gender, age,
+        enrollments(section:sections(grade_level, name))
+      )
+    `)
+    .order('risk_score', { ascending: false })
+
+  if (error) throw error
+  return data.map((p) => ({
+    id: p.id,
+    riskScore: p.risk_score,
+    riskLevel: p.risk_level,
+    projectedAverage: Number(p.projected_average) || 0,
+    failingSubjects: p.failing_subjects,
+    computedAt: p.computed_at?.slice(0, 10),
+    studentName: p.student?.full_name,
+    lrn: p.student?.lrn,
+    grade: p.student?.enrollments?.[0]?.section?.grade_level,
+    section: p.student?.enrollments?.[0]?.section?.name
+  }))
+}
+
+// ---------------------------------------------------------------------
 // Static-ish chart data — re-exported for now; later move to live aggregations
 // ---------------------------------------------------------------------
 export const chartData = {
