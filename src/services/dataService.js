@@ -287,6 +287,25 @@ export async function fetchAttendance() {
 }
 
 // ---------------------------------------------------------------------
+// Health records (BMI, immunizations, clinic visits)
+// ---------------------------------------------------------------------
+export async function fetchHealthRecords() {
+  if (!isSupabaseConfigured) return { records: [], visits: [] }
+
+  const [recordsRes, visitsRes] = await Promise.all([
+    supabase.from('health_records').select('*, student:students(full_name, lrn)').limit(100),
+    supabase.from('clinic_visits').select('*, student:students(full_name, lrn)').order('visit_date', { ascending: false }).limit(50)
+  ])
+  if (recordsRes.error) throw recordsRes.error
+  if (visitsRes.error) throw visitsRes.error
+
+  return {
+    records: recordsRes.data || [],
+    visits: visitsRes.data || []
+  }
+}
+
+// ---------------------------------------------------------------------
 // Static-ish chart data — re-exported for now; later move to live aggregations
 // ---------------------------------------------------------------------
 export const chartData = {
