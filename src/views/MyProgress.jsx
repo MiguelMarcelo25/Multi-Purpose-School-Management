@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useData } from '../context/DataContext.jsx'
-import { HEALTH_RECORDS, IMMUNIZATIONS } from '../data/mockData.js'
 import {
   PageHeader, KPICard, ChartCard, DataTable,
   EmptyState, LoadingState, ErrorState
@@ -16,7 +15,7 @@ import {
 
 export default function MyProgress() {
   const { profile } = useAuth()
-  const { students, loading, error, retry } = useData()
+  const { students, healthRecords, loading, error, retry, mode } = useData()
 
   // In demo mode, just pick the first student to showcase the view.
   // In live mode this would come from `students.find(s => s.profileId === profile.id)`
@@ -68,8 +67,35 @@ export default function MyProgress() {
     )
   }
 
-  const myHealth = HEALTH_RECORDS.find((h) => h.studentId === me.id)
-  const myImmun = IMMUNIZATIONS.filter((i) => i.studentId === me.id)
+  // Look up the signed-in student's real health records from live data.
+  // me.id is the LRN; the joined `student.lrn` lets us match without
+  // needing a separate UUID. In demo / mock mode `healthRecords` is empty
+  // by design so we simply render "No records on file" instead of the
+  // fictional mock data the previous build leaked.
+  // TODO: when an account-to-student link exists (profiles.id ->
+  //   students.profile_id), prefer the join over the LRN match.
+  const records = healthRecords?.records || []
+  const immuns  = healthRecords?.immunizations || []
+  const myHealthRow = records.find((h) => h.student?.lrn === me.id) || null
+  const myImmunRows = immuns.filter((i) => i.student?.lrn === me.id)
+
+  // Normalize snake_case columns from Supabase to the camelCase shape the
+  // template below renders.
+  const myHealth = myHealthRow ? {
+    heightCm:    myHealthRow.height_cm,
+    weightKg:    myHealthRow.weight_kg,
+    bmi:         myHealthRow.bmi,
+    bmiCategory: myHealthRow.bmi_category,
+    bloodType:   myHealthRow.blood_type,
+    vision:      myHealthRow.vision,
+    allergies:   myHealthRow.allergies
+  } : null
+
+  const myImmun = myImmunRows.map((i) => ({
+    vaccine:        i.vaccine,
+    administeredOn: i.administered_on,
+    status:         i.status
+  }))
 
   const gradeColumns = [
     { key: 'subject', header: 'Subject',
