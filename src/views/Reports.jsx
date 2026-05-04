@@ -1,7 +1,10 @@
 // src/views/Reports.jsx
-import { PageHeader, ChartCard } from '../components/ui'
+import {
+  PageHeader, ChartCard,
+  LoadingState, ErrorState, EmptyState
+} from '../components/ui'
 import { useData } from '../context/DataContext.jsx'
-import { Download } from 'lucide-react'
+import { Download, FileText } from 'lucide-react'
 
 const REPORTS = [
   { id: 'attendance',  title: 'Attendance Summary',     desc: 'Last 30 days, by section', source: 'attendance.bySection' },
@@ -27,6 +30,7 @@ function download(name, content) {
 
 export default function Reports() {
   const data = useData()
+  const { loading, error, retry } = data
 
   function generate(report) {
     const path = report.source.split('.')
@@ -34,6 +38,33 @@ export default function Reports() {
     for (const p of path) value = value?.[p]
     const rows = Array.isArray(value) ? value : []
     download(`${report.id}.csv`, toCSV(rows))
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-4">
+        <PageHeader title="Reports" subtitle="Generate exports of school data" />
+        <LoadingState rows={3} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 space-y-4">
+        <PageHeader title="Reports" subtitle="Generate exports of school data" />
+        <ErrorState title="Failed to load report data" message={error} onRetry={retry} />
+      </div>
+    )
+  }
+
+  if (!REPORTS.length) {
+    return (
+      <div className="p-6 space-y-4">
+        <PageHeader title="Reports" subtitle="Generate exports of school data" />
+        <EmptyState icon={FileText} title="No reports configured" message="Reports will appear here once configured." />
+      </div>
+    )
   }
 
   return (
