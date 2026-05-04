@@ -192,6 +192,62 @@ export async function fetchPredictions() {
 }
 
 // ---------------------------------------------------------------------
+// Academics (grade aggregates by subject + grade level)
+// ---------------------------------------------------------------------
+export async function fetchAcademics() {
+  if (!isSupabaseConfigured) return { bySubject: SUBJECT_PERFORMANCE, byGrade: GRADE_PERFORMANCE, honorRoll: [] }
+
+  const { data, error } = await supabase
+    .from('grades')
+    .select(`
+      grade, quarter,
+      subject:subjects(name),
+      student:students(full_name, lrn,
+        enrollments(section:sections(grade_level, name))
+      )
+    `)
+  if (error) throw error
+
+  // Aggregate by subject
+  const bySubjectMap = {}
+  for (const g of data) {
+    const subj = g.subject?.name || 'Unknown'
+    bySubjectMap[subj] ??= { subject: subj, sum: 0, count: 0 }
+    bySubjectMap[subj].sum += Number(g.grade)
+    bySubjectMap[subj].count++
+  }
+  const bySubject = Object.values(bySubjectMap).map((s) => ({ subject: s.subject, average: Math.round((s.sum / s.count) * 10) / 10 }))
+
+  // Aggregate by grade level
+  const byGradeMap = {}
+  for (const g of data) {
+    const gl = g.student?.enrollments?.[0]?.section?.grade_level
+    if (!gl) continue
+    byGradeMap[gl] ??= { grade: `Grade ${gl}`, sum: 0, count: 0 }
+    byGradeMap[gl].sum += Number(g.grade)
+    byGradeMap[gl].count++
+  }
+  const byGrade = Object.values(byGradeMap).sort((a, b) => a.grade.localeCompare(b.grade))
+    .map((g) => ({ grade: g.grade, average: Math.round((g.sum / g.count) * 10) / 10 }))
+
+  // Honor roll: students whose average across all subjects >= 90
+  const studentMap = {}
+  for (const g of data) {
+    const name = g.student?.full_name
+    if (!name) continue
+    studentMap[name] ??= { name, lrn: g.student.lrn, sum: 0, count: 0 }
+    studentMap[name].sum += Number(g.grade)
+    studentMap[name].count++
+  }
+  const honorRoll = Object.values(studentMap)
+    .map((s) => ({ name: s.name, lrn: s.lrn, average: Math.round((s.sum / s.count) * 10) / 10 }))
+    .filter((s) => s.average >= 90)
+    .sort((a, b) => b.average - a.average)
+
+  return { bySubject, byGrade, honorRoll }
+}
+
+// ---------------------------------------------------------------------
 // Static-ish chart data — re-exported for now; later move to live aggregations
 // ---------------------------------------------------------------------
 export const chartData = {
