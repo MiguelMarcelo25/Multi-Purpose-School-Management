@@ -61,10 +61,13 @@ export default function Predictive() {
     {
       key: 'projectedAverage',
       header: 'Projected Avg.',
-      render: (p) =>
-        p.projectedAverage
-          ? <span className="tabular-nums">{p.projectedAverage.toFixed(1)}</span>
+      render: (p) => {
+        // Supabase numeric columns can come back as strings; coerce defensively.
+        const v = Number(p.projectedAverage)
+        return Number.isFinite(v) && v > 0
+          ? <span className="tabular-nums">{v.toFixed(1)}</span>
           : '—'
+      }
     },
     {
       key: 'failingSubjects',
