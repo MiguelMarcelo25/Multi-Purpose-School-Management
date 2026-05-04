@@ -1,83 +1,102 @@
-import { AlertTriangle, Bell, CheckCircle, Clock } from 'lucide-react'
-import { ALERTS, STUDENTS_WITH_RISK } from '../data/mockData.js'
+import { useMemo, useState } from 'react'
+import { Bell, AlertTriangle } from 'lucide-react'
+import {
+  PageHeader, KPICard, AlertItem, EmptyState,
+  LoadingState, ErrorState
+} from '../components/ui'
+import { useData } from '../context/DataContext.jsx'
 
-const allAlerts = [
-  ...ALERTS,
-  ...STUDENTS_WITH_RISK.filter((s) => s.risk.level === 'Medium').slice(0, 12).map((s, i) => ({
-    id: `M-${i}`,
-    student: s.name,
-    studentId: s.id,
-    grade: s.grade,
-    section: s.section,
-    type: s.attendance < 88 ? 'Attendance' : s.average < 82 ? 'Academic' : 'Tardiness',
-    severity: 'Medium',
-    detectedAt: `2026-04-${(15 + i) % 30}`,
-    note: `Watchlist: ${s.name} flagged with risk score ${Math.round(s.risk.score)}.`
-  }))
-]
+const SEVERITY_FILTERS = ['All', 'High', 'Medium', 'Low']
 
 export default function Alerts() {
-  return (
-    <div className="p-8 space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Mini label="Active Alerts"  value={allAlerts.length} icon={Bell} tone="red" />
-        <Mini label="High Severity"  value={ALERTS.length}    icon={AlertTriangle} tone="red" />
-        <Mini label="Resolved"       value="34" icon={CheckCircle} tone="green" />
-        <Mini label="Avg. Response"  value="2.1d" icon={Clock} tone="amber" />
-      </div>
+  const { alerts, loading, error, retry } = useData()
+  const [filter, setFilter] = useState('All')
 
-      <div className="card p-6">
-        <h3 className="text-base font-bold text-slate-900 mb-4">All Alerts</h3>
-        <div className="divide-y divide-slate-100">
-          {allAlerts.map((a) => {
-            const sev = a.severity === 'High' ? 'red' : 'amber'
-            const tones = { red: 'bg-red-50 text-red-700 border-red-200', amber: 'bg-amber-50 text-amber-700 border-amber-200' }
-            return (
-              <div key={a.id} className="py-4 flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0 ${tones[sev]}`}>
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-bold text-slate-900">{a.student}</p>
-                    <span className="badge-slate font-mono">{a.studentId}</span>
-                    <span className="badge-slate">Grade {a.grade}-{a.section}</span>
-                    <span className={a.severity === 'High' ? 'badge-red' : 'badge-amber'}>{a.severity}</span>
-                    <span className="badge-blue">{a.type}</span>
-                  </div>
-                  <p className="text-sm text-slate-600 mt-1">{a.note}</p>
-                  <p className="text-xs text-slate-400 mt-1">{a.detectedAt}</p>
-                </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button className="btn-ghost text-xs">Dismiss</button>
-                  <button className="btn-primary text-xs py-1.5">Take Action</button>
-                </div>
+  const filtered = useMemo(() => {
+    if (filter === 'All') return alerts
+    return alerts.filter((a) => a.severity === filter)
+  }, [alerts, filter])
+
+  const counts = useMemo(() => ({
+    total: alerts.length,
+    high:   alerts.filter((a) => a.severity === 'High').length,
+    medium: alerts.filter((a) => a.severity === 'Medium').length,
+    low:    alerts.filter((a) => a.severity === 'Low').length
+  }), [alerts])
+
+  return (
+    <div className="p-6 space-y-5">
+      <PageHeader
+        title="Alerts"
+        subtitle="Active notifications flagged by the early-warning system"
+      />
+
+      {loading && (
+        <>
+          <LoadingState variant="kpis" />
+          <LoadingState rows={6} />
+        </>
+      )}
+
+      {error && !loading && (
+        <ErrorState
+          title="Could not load alerts"
+          message={error}
+          onRetry={retry}
+        />
+      )}
+
+      {!loading && !error && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+            <KPICard label="Active Alerts" value={counts.total}  icon={Bell} />
+            <KPICard label="High Severity" value={counts.high}   icon={AlertTriangle} emphasis={counts.high > 0 ? 'danger' : 'default'} />
+            <KPICard label="Medium"        value={counts.medium} icon={AlertTriangle} />
+            <KPICard label="Low"           value={counts.low}    icon={AlertTriangle} />
+          </div>
+
+          <div className="bg-bi-card border border-bi-border rounded-[10px] p-[14px]">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-bi-text">All Alerts</h3>
+              <div className="flex items-center gap-1">
+                {SEVERITY_FILTERS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setFilter(s)}
+                    className={`text-xs font-semibold px-2.5 py-1 rounded transition-colors ${
+                      filter === s
+                        ? 'bg-bi-primary text-white'
+                        : 'bg-bi-tint text-bi-text-soft hover:bg-bi-border'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
-            )
-          })}
-        </div>
-      </div>
-    </div>
-  )
-}
+            </div>
 
-function Mini({ label, value, icon: Icon, tone }) {
-  const tones = {
-    red:   'bg-red-50 text-red-700',
-    green: 'bg-emerald-50 text-emerald-700',
-    amber: 'bg-amber-50 text-amber-700'
-  }
-  return (
-    <div className="stat-card">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase text-slate-500 font-medium">{label}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{value}</p>
-        </div>
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${tones[tone]}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-      </div>
+            {filtered.length === 0 ? (
+              <EmptyState
+                icon={Bell}
+                title="No alerts"
+                message={filter === 'All' ? 'No active alerts at this time.' : `No ${filter.toLowerCase()}-severity alerts.`}
+              />
+            ) : (
+              <div>
+                {filtered.map((a) => (
+                  <AlertItem
+                    key={a.id}
+                    severity={a.severity}
+                    studentName={a.student}
+                    type={`${a.type}${a.grade ? ` · Grade ${a.grade}-${a.section}` : ''}`}
+                    detectedAt={a.detectedAt}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }
