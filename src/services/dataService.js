@@ -248,6 +248,45 @@ export async function fetchAcademics() {
 }
 
 // ---------------------------------------------------------------------
+// Attendance (daily aggregates and per-section breakdown)
+// ---------------------------------------------------------------------
+export async function fetchAttendance() {
+  if (!isSupabaseConfigured) return { byDay: ATTENDANCE_BY_MONTH, bySection: [] }
+
+  const { data, error } = await supabase
+    .from('attendance')
+    .select(`date, status, student:students(enrollments(section:sections(grade_level, name)))`)
+    .gte('date', new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10))
+  if (error) throw error
+
+  // Daily aggregates
+  const byDayMap = {}
+  for (const a of data) {
+    byDayMap[a.date] ??= { date: a.date, present: 0, total: 0 }
+    byDayMap[a.date].total++
+    if (a.status === 'present') byDayMap[a.date].present++
+  }
+  const byDay = Object.values(byDayMap).sort((a, b) => a.date.localeCompare(b.date))
+    .map((d) => ({ date: d.date, attendance_pct: Math.round((d.present / d.total) * 100 * 10) / 10 }))
+
+  // Section aggregates
+  const bySectionMap = {}
+  for (const a of data) {
+    const sec = a.student?.enrollments?.[0]?.section
+    if (!sec) continue
+    const key = `Grade ${sec.grade_level} ${sec.name}`
+    bySectionMap[key] ??= { section: key, present: 0, total: 0 }
+    bySectionMap[key].total++
+    if (a.status === 'present') bySectionMap[key].present++
+  }
+  const bySection = Object.values(bySectionMap)
+    .map((s) => ({ section: s.section, attendance_pct: Math.round((s.present / s.total) * 100 * 10) / 10 }))
+    .sort((a, b) => a.section.localeCompare(b.section))
+
+  return { byDay, bySection }
+}
+
+// ---------------------------------------------------------------------
 // Static-ish chart data — re-exported for now; later move to live aggregations
 // ---------------------------------------------------------------------
 export const chartData = {
