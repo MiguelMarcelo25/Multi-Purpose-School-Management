@@ -99,15 +99,15 @@ export default function Attendance() {
             ) : (
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={byDay}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                  <YAxis stroke="#64748b" fontSize={11} domain={[0, 100]} />
-                  <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
-                  <ReferenceLine y={90} stroke="#94a3b8" strokeDasharray="3 3" label={{ value: 'Target 90%', position: 'right', fontSize: 10, fill: '#64748b' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e8e4dc" />
+                  <XAxis dataKey="date" stroke="#a8a29e" fontSize={11} />
+                  <YAxis stroke="#a8a29e" fontSize={11} domain={[0, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e8e4dc', fontSize: 12 }} />
+                  <ReferenceLine y={90} stroke="#a8a29e" strokeDasharray="3 3" label={{ value: 'Target 90%', position: 'right', fontSize: 10, fill: '#a8a29e' }} />
                   <Line
                     type="monotone"
                     dataKey="attendance_pct"
-                    stroke="#2563eb"
+                    stroke="#b45309"
                     strokeWidth={2.5}
                     dot={{ r: 3 }}
                     activeDot={{ r: 5 }}
