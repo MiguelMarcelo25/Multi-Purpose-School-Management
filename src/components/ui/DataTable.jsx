@@ -48,37 +48,39 @@ export default function DataTable({ columns, rows, onRowClick, searchable = fals
           </div>
         </div>
       )}
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-bi-border bg-bi-bg/50">
-            {columns.map((c) => (
-              <th key={c.key} className="text-left px-3 py-2 text-xs font-semibold text-bi-text-mute uppercase tracking-wider">
-                <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1 hover:text-bi-text">
-                  {c.header}
-                  {sort.key === c.key && (sort.dir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
-                </button>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {pageRows.length === 0 ? (
-            <tr><td colSpan={columns.length} className="text-center text-bi-text-mute py-8 text-xs">{emptyMessage}</td></tr>
-          ) : pageRows.map((r, i) => (
-            <tr
-              key={i}
-              onClick={() => onRowClick?.(r)}
-              className={`border-b border-bi-border last:border-b-0 ${onRowClick ? 'cursor-pointer hover:bg-bi-tint' : ''}`}
-            >
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
+          <thead>
+            <tr className="border-b border-bi-border bg-bi-bg/50">
               {columns.map((c) => (
-                <td key={c.key} className="px-3 py-2 text-bi-text">
-                  {c.render ? c.render(r) : r[c.key]}
-                </td>
+                <th key={c.key} className="text-left px-3 py-2 text-xs font-semibold text-bi-text-mute uppercase tracking-wider whitespace-nowrap">
+                  <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1 hover:text-bi-text">
+                    {c.header}
+                    {sort.key === c.key && (sort.dir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />)}
+                  </button>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {pageRows.length === 0 ? (
+              <tr><td colSpan={columns.length} className="text-center text-bi-text-mute py-8 text-xs">{emptyMessage}</td></tr>
+            ) : pageRows.map((r, i) => (
+              <tr
+                key={i}
+                onClick={() => onRowClick?.(r)}
+                className={`border-b border-bi-border last:border-b-0 ${onRowClick ? 'cursor-pointer hover:bg-bi-tint' : ''}`}
+              >
+                {columns.map((c) => (
+                  <td key={c.key} className="px-3 py-2 text-bi-text">
+                    {c.render ? c.render(r) : r[c.key]}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {pages > 1 && (
         <div className="px-3 py-2 border-t border-bi-border flex items-center justify-between text-xs text-bi-text-mute">
           <span>Showing {page * pageSize + 1}-{Math.min((page + 1) * pageSize, sorted.length)} of {sorted.length}</span>
